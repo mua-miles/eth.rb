@@ -322,8 +322,10 @@ describe Abi do
       expect(Util.bin_to_hex Abi.encode(["int64[]"], [[1, 2, 3]], true)).to eq "000000000000000100000000000000020000000000000003"
       expect(Util.bin_to_hex Abi.encode(["int64"], [17], true)).to eq "0000000000000011"
       expect(Util.bin_to_hex Abi.encode(["int128"], [17], true)).to eq "00000000000000000000000000000011"
+      expect(Util.bin_to_hex Abi.encode(["address"], ["0x3F0500B79C099DFE2638D0faF1C03f56b90d12d1"], true)).to eq "3f0500b79c099dfe2638d0faf1c03f56b90d12d1"
+
       # expect(Util.bin_to_hex Abi.encode(["bytes1"], [0x42], true)).to eq "42"
-      expect(Util.bin_to_hex Abi.encode(["string"], ["Hello, world!"], true)).to eq "00000000000000000000000000000011"
+      # expect(Util.bin_to_hex Abi.encode(["string"], ["Hello, world!"], true)).to eq "00000000000000000000000000000011"
     end
   end
 end

@@ -32,11 +32,8 @@ module Eth
       # @return [String] the encoded type.
       # @raise [EncodingError] if value does not match type.
       def type(type, arg, packed = false)
-
-
         if %w(string bytes).include? type.base_type and type.sub_type.empty? and type.dimensions.empty?
           raise EncodingError, "Argument must be a String" unless arg.instance_of? String
-
           # encodes strings and bytes
           size = type(Type.size_type, arg.size, packed)
           padding = Constant::BYTE_ZERO * (Util.ceil32(arg.size) - arg.size)
@@ -47,7 +44,6 @@ module Eth
           result += arg.map { |x| type(type.nested_sub, x, packed) }.join
           result
         elsif type.dynamic? && arg.is_a?(Array)
-
           # encodes dynamic-sized arrays
           head, tail = "", ""
           head += type(Type.size_type, arg.size, packed) unless packed
@@ -79,7 +75,6 @@ module Eth
           "#{head}#{tail}"
         else
           if type.dimensions.empty?
-
             # encode a primitive type
             primitive_type type, arg, packed
           else
@@ -118,7 +113,7 @@ module Eth
         when "hash" # TODO: Q9F
           hash arg, type
         when "address" # TODO: Q9F
-          address arg
+          address arg, packed
         else
           raise EncodingError, "Unhandled type: #{type.base_type} #{type.sub_type}"
         end
@@ -275,27 +270,42 @@ module Eth
       end
 
       # Properly encodes addresses.
-      def address(arg)
+      def address(arg, packed)
         if arg.is_a? Address
-
           # address from eth::address
-          Util.zpad_hex arg.to_s
+          if packed
+            Util.zpad_hex arg.to_s[2..-1], 20
+          else
+            Util.zpad_hex arg.to_s
+          end
         elsif arg.is_a? Integer
-
           # address from integer
-          Util.zpad_int arg
+          if packed
+            Util.zpad_int arg, 20
+          else
+            Util.zpad_int arg
+          end
         elsif arg.size == 20
-
           # address from encoded address
-          Util.zpad arg, 32
+          if packed
+            Util.zpad arg, 20
+          else
+            Util.zpad arg, 32
+          end
         elsif arg.size == 40
-
           # address from hexadecimal address with 0x prefix
-          Util.zpad_hex arg
+          if packed
+            Util.zpad_hex arg, 20
+          else
+            Util.zpad_hex arg
+          end
         elsif arg.size == 42 and arg[0, 2] == "0x"
-
           # address from hexadecimal address
-          Util.zpad_hex arg[2..-1]
+          if packed
+            Util.zpad_hex arg[2..-1], 20
+          else
+            Util.zpad_hex arg[2..-1]
+          end
         else
           raise EncodingError, "Could not parse address: #{arg}"
         end
