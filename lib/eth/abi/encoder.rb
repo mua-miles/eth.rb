@@ -37,6 +37,8 @@ module Eth
           # encodes strings and bytes
           size = type(Type.size_type, arg.size, packed)
           padding = Constant::BYTE_ZERO * (Util.ceil32(arg.size) - arg.size)
+
+          return "#{arg}" if packed
           "#{size}#{arg}#{padding}"
         elsif type.base_type == "tuple" && type.dimensions.size == 1 && type.dimensions[0] != 0
           result = ""
@@ -51,7 +53,7 @@ module Eth
           nested_sub_size = type.nested_sub.size
 
           # calculate offsets
-          if %w(string bytes).include?(type.base_type) && type.sub_type.empty?
+          if %w(string bytes).include?(type.base_type) && type.sub_type.empty? && !packed
             offset = 0
             arg.size.times do |i|
               if i == 0
@@ -64,7 +66,7 @@ module Eth
 
               head += type(Type.size_type, offset, packed)
             end
-          elsif nested_sub.base_type == "tuple" && nested_sub.dynamic?
+          elsif nested_sub.base_type == "tuple" && nested_sub.dynamic? && !packed
             head += struct_offsets(nested_sub, arg)
           end
 
@@ -192,6 +194,8 @@ module Eth
           padding = Constant::BYTE_ZERO * (32 - arg.size)
 
           pp arg, padding if packed
+
+          return "#{arg}" if packed
 
           # fixed length string/bytes
           "#{arg}#{padding}"

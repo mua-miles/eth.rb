@@ -324,8 +324,12 @@ describe Abi do
       expect(Util.bin_to_hex Abi.encode(["int128"], [17], true)).to eq "00000000000000000000000000000011"
       expect(Util.bin_to_hex Abi.encode(["address"], ["0x3F0500B79C099DFE2638D0faF1C03f56b90d12d1"], true)).to eq "3f0500b79c099dfe2638d0faf1c03f56b90d12d1"
 
-      # expect(Util.bin_to_hex Abi.encode(["bytes1"], [0x42], true)).to eq "42"
-      # expect(Util.bin_to_hex Abi.encode(["string"], ["Hello, world!"], true)).to eq "00000000000000000000000000000011"
+      expect(Util.bin_to_hex Abi.encode(["bytes"], ["42"], true)).to eq "3432"
+      expect(Util.bin_to_hex Abi.encode(["bytes"], ["424a"], true)).to eq "34323461"
+      expect(Util.bin_to_hex Abi.encode(["string"], ["Hello, world!"], true)).to eq "48656c6c6f2c20776f726c6421"
+      expect(Util.bin_to_hex(Abi.encode ["uint256[]", "string[]", "string[]", "uint8[]"], [[123, 456], ["hello", "world"], ["ruby", "ethereum"], [8]], true)).to eq "000000000000000000000000000000000000000000000000000000000000007b00000000000000000000000000000000000000000000000000000000000001c868656c6c6f776f726c6472756279657468657265756d08"
+      expect(Util.bin_to_hex(Abi.encode ["uint256[]", "string[]"], [[123, 456], ["hello", "world"]], true)).to eq "000000000000000000000000000000000000000000000000000000000000007b00000000000000000000000000000000000000000000000000000000000001c868656c6c6f776f726c64"
+      expect(Util.bin_to_hex(Abi.encode ["string[]"], [["hello", "world"]], true)).to eq "68656c6c6f776f726c64"
     end
   end
 end
