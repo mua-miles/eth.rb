@@ -322,7 +322,8 @@ module Eth
     def transact_and_wait(contract, function, *args, **kwargs)
       begin
         hash = wait_for_tx(transact(contract, function, *args, **kwargs))
-        return hash if tx_succeeded? hash
+        # return hash if tx_succeeded? hash
+        return hash
       rescue IOError => e
         raise ContractExecutionError, e
       end
